@@ -24,7 +24,7 @@ export function GoalsSection() {
           <GoalCard
             icon={<Target className="w-8 h-8 text-beige-400" />}
             title="Aktywizacja"
-            description="Wspieranie rozwoju zawodowego kobiet w celu zmiany ich reorientacji zawodowej i pozycji na rynku pracy"
+            description="Wspieranie rozwoju zawodowego w celu zmiany reorientacji zawodowej i pozycji na rynku pracy"
           />
           <GoalCard
             icon={<Heart className="w-8 h-8 text-beige-400" />}

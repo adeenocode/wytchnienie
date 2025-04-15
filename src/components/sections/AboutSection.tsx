@@ -26,7 +26,7 @@ export function AboutSection() {
               </p>
               <p className="text-gray-600 mb-6 font-light text-base lg:text-lg">
                 Jesteśmy grupą kobiet o różnym doświadczeniu życiowym i zawodowym. Wśród nas są: prawniczka,
-                logopeda, księgowa, specjalistka od marketingu, studentka oraz aktywna seniorka.
+                logopeda, księgowa, specjalistka ds. marketingu, specjalistka ds. HR, oraz aktywna seniorka.
               </p>
               <p className="text-gray-600 mb-6 font-light text-base lg:text-lg">
                 To co nas łączy, to umiejętność nawiązywania bliskich relacji z ludźmi, oparta na zaufaniu, szacunku,
