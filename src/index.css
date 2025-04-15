@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply font-sans font-light overflow-x-hidden;
+    scroll-behavior: smooth;
+  }
+}
+
+#root {
+  @apply overflow-x-hidden;
+}
+
+/* Hide default Swiper navigation arrows */
+.swiper-button-next,
+.swiper-button-prev {
+  display: none !important;
+}
+
+/* Custom pagination styles */
+.swiper-pagination-bullet {
+  @apply bg-beige-400 !important;
+  opacity: 0.5 !important;
+}
+
+.swiper-pagination-bullet-active {
+  @apply bg-beige-400 !important;
+  opacity: 1 !important;
+}
+
+/* Custom navigation styles */
+.custom-swiper-button-prev.swiper-button-disabled,
+.custom-swiper-button-next.swiper-button-disabled {
+  @apply opacity-50 cursor-not-allowed;
+}
+
+.swiper-wrapper {
+  @apply items-stretch;
+}
+
+.swiper-slide {
+  height: auto !important;
+}
