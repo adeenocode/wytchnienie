@@ -159,7 +159,7 @@ export function ProjectModal({ project, onClose }: ProjectModalProps) {
             </div>
           )}
           
-          {project.status === 'completed' && project.endDate && (
+          {project.status === 'completed' && project.end_date && (
             <div>
               <div className="flex items-center gap-2 text-gray-500">
                 <Calendar className="w-5 h-5" />
