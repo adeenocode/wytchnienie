@@ -2,7 +2,7 @@ import React from 'react';
 import { supabase } from '../../lib/supabase';
 import { uploadProjectImage, deleteProjectImage } from '../../lib/supabase';
 import { Project } from '../../types/project';
-import { X } from 'lucide-react';
+import { X, Upload } from 'lucide-react';
 
 interface ProjectFormProps {
   project?: Project;
@@ -24,6 +24,8 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
   const [additionalImagePreviews, setAdditionalImagePreviews] = React.useState<string[]>(project?.images || []);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  const [isDragging, setIsDragging] = React.useState(false);
+  const dropZoneRef = React.useRef<HTMLDivElement>(null);
 
   const handleMainImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -43,6 +45,41 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
   const removeAdditionalImage = (index: number) => {
     setAdditionalImagePreviews(prev => prev.filter((_, i) => i !== index));
     setAdditionalImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleDragEnter = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.currentTarget === dropZoneRef.current) {
+      setIsDragging(false);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    const files = Array.from(e.dataTransfer.files).filter(file => 
+      file.type.startsWith('image/')
+    );
+
+    if (files.length > 0) {
+      setAdditionalImages(prev => [...prev, ...files]);
+      const newPreviews = files.map(file => URL.createObjectURL(file));
+      setAdditionalImagePreviews(prev => [...prev, ...newPreviews]);
+    }
   };
 
   React.useEffect(() => {
@@ -254,32 +291,75 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Dodatkowe zdjęcia
+          <span className="text-sm text-gray-500 ml-2">
+            (możesz przeciągnąć i upuścić zdjęcia)
+          </span>
         </label>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-          {additionalImagePreviews.map((url, index) => (
-            <div key={index} className="relative w-full aspect-[4/3] rounded-lg overflow-hidden">
-              <img
-                src={url}
-                alt={`Zdjęcie ${index + 1}`}
-                className="w-full h-full object-cover"
-              />
-              <button
-                type="button"
-                onClick={() => removeAdditionalImage(index)}
-                className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-          ))}
+        <div
+          ref={dropZoneRef}
+          onDragEnter={handleDragEnter}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          className={`
+            border-2 border-dashed rounded-lg p-6 mb-4 transition-colors
+            ${isDragging 
+              ? 'border-beige-400 bg-beige-50' 
+              : 'border-gray-300 hover:border-beige-400'
+            }
+          `}
+        >
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {additionalImagePreviews.map((url, index) => (
+              <div key={index} className="relative w-full aspect-[4/3] rounded-lg overflow-hidden bg-gray-50">
+                <img
+                  src={url}
+                  alt={`Zdjęcie ${index + 1}`}
+                  className="w-full h-full object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeAdditionalImage(index)}
+                  className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            ))}
+            {additionalImagePreviews.length === 0 && (
+              <div className="col-span-full flex flex-col items-center justify-center text-gray-500 py-8">
+                <Upload className="w-12 h-12 mb-4" />
+                <p className="text-center">
+                  Przeciągnij i upuść zdjęcia tutaj lub
+                  <label className="text-beige-400 hover:text-beige-500 cursor-pointer ml-1">
+                    wybierz z dysku
+                    <input
+                      type="file"
+                      multiple
+                      onChange={handleAdditionalImagesChange}
+                      accept="image/*"
+                      className="hidden"
+                    />
+                  </label>
+                </p>
+              </div>
+            )}
+          </div>
         </div>
-        <input
-          type="file"
-          multiple
-          onChange={handleAdditionalImagesChange}
-          accept="image/*"
-          className="w-full"
-        />
+        {additionalImagePreviews.length > 0 && (
+          <div className="text-center">
+            <label className="inline-block px-4 py-2 bg-gray-100 rounded-md cursor-pointer hover:bg-gray-200 transition-colors">
+              <span className="text-gray-700">Dodaj więcej zdjęć</span>
+              <input
+                type="file"
+                multiple
+                onChange={handleAdditionalImagesChange}
+                accept="image/*"
+                className="hidden"
+              />
+            </label>
+          </div>
+        )}
       </div>
 
       <div className="flex justify-end gap-4">
