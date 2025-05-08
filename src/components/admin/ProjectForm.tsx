@@ -317,31 +317,31 @@ export function ProjectForm({ onSuccess }: ProjectFormProps) {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Główne zdjęcie
+              {mainImagePreview && (
+                <div className="mt-2 relative w-48 h-32 rounded-lg overflow-hidden">
+                  <img
+                    src={mainImagePreview}
+                    alt="Podgląd"
+                    className="w-full h-full object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMainImage(null);
+                      setMainImagePreview('');
+                    }}
+                    className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
             </label>
-            {mainImagePreview && (
-              <div className="mt-2 relative w-48 h-32 rounded-lg overflow-hidden">
-                <img
-                  src={mainImagePreview}
-                  alt="Podgląd"
-                  className="w-full h-full object-cover"
-                />
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMainImage(null);
-                    setMainImagePreview('');
-                  }}
-                  className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-            )}
             <input
               type="file"
               onChange={handleMainImageChange}
               accept="image/*"
-              className="w-full"
+              className="w-full mt-2"
             />
           </div>
 
