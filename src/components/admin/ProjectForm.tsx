@@ -1,7 +1,8 @@
 import React from 'react';
 import { supabase } from '../../lib/supabase';
-import { uploadProjectImage } from '../../lib/supabase';
+import { uploadProjectImage, deleteProjectImage } from '../../lib/supabase';
 import { Project } from '../../types/project';
+import { X } from 'lucide-react';
 
 interface ProjectFormProps {
   project?: Project;
@@ -18,9 +19,41 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
   const [scope, setScope] = React.useState(project?.scope || '');
   const [results, setResults] = React.useState(project?.results?.join('\n') || '');
   const [mainImage, setMainImage] = React.useState<File | null>(null);
+  const [mainImagePreview, setMainImagePreview] = React.useState(project?.image || '');
   const [additionalImages, setAdditionalImages] = React.useState<File[]>([]);
+  const [additionalImagePreviews, setAdditionalImagePreviews] = React.useState<string[]>(project?.images || []);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+
+  const handleMainImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setMainImage(file);
+      setMainImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleAdditionalImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    setAdditionalImages(prev => [...prev, ...files]);
+    const newPreviews = files.map(file => URL.createObjectURL(file));
+    setAdditionalImagePreviews(prev => [...prev, ...newPreviews]);
+  };
+
+  const removeAdditionalImage = (index: number) => {
+    setAdditionalImagePreviews(prev => prev.filter((_, i) => i !== index));
+    setAdditionalImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  React.useEffect(() => {
+    // Cleanup URLs when component unmounts
+    return () => {
+      if (mainImagePreview && !project?.image) URL.revokeObjectURL(mainImagePreview);
+      additionalImagePreviews.forEach(url => {
+        if (!project?.images?.includes(url)) URL.revokeObjectURL(url);
+      });
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -190,10 +223,29 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Główne zdjęcie
+          {mainImagePreview && (
+            <div className="mt-2 relative w-48 h-32 rounded-lg overflow-hidden">
+              <img
+                src={mainImagePreview}
+                alt="Podgląd"
+                className="w-full h-full object-cover"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  setMainImage(null);
+                  setMainImagePreview('');
+                }}
+                className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          )}
         </label>
         <input
           type="file"
-          onChange={(e) => setMainImage(e.target.files?.[0] || null)}
+          onChange={handleMainImageChange}
           accept="image/*"
           className="w-full"
         />
@@ -203,10 +255,28 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Dodatkowe zdjęcia
         </label>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+          {additionalImagePreviews.map((url, index) => (
+            <div key={index} className="relative w-full aspect-[4/3] rounded-lg overflow-hidden">
+              <img
+                src={url}
+                alt={`Zdjęcie ${index + 1}`}
+                className="w-full h-full object-cover"
+              />
+              <button
+                type="button"
+                onClick={() => removeAdditionalImage(index)}
+                className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          ))}
+        </div>
         <input
           type="file"
           multiple
-          onChange={(e) => setAdditionalImages(Array.from(e.target.files || []))}
+          onChange={handleAdditionalImagesChange}
           accept="image/*"
           className="w-full"
         />
