@@ -21,8 +21,9 @@ export function ProjectForm({ onSuccess }: ProjectFormProps) {
   const [results, setResults] = React.useState('');
   const [mainImage, setMainImage] = React.useState<File | null>(null);
   const [mainImagePreview, setMainImagePreview] = React.useState('');
-  const [additionalImages, setAdditionalImages] = React.useState<File[]>([]);
-  const [additionalImagePreviews, setAdditionalImagePreviews] = React.useState<string[]>([]);
+  const [newAdditionalImages, setNewAdditionalImages] = React.useState<File[]>([]);
+  const [existingImages, setExistingImages] = React.useState<string[]>([]);
+  const [imagePreviews, setImagePreviews] = React.useState<Array<{ url: string; isNew: boolean }>>([]);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [isDragging, setIsDragging] = React.useState(false);
@@ -53,7 +54,8 @@ export function ProjectForm({ onSuccess }: ProjectFormProps) {
           setScope(data.scope || '');
           setResults(data.results?.join('\n') || '');
           setMainImagePreview(data.image || '');
-          setAdditionalImagePreviews(data.images || []);
+          setExistingImages(data.images || []);
+          setImagePreviews((data.images || []).map(url => ({ url, isNew: false })));
         }
       } catch (error) {
         setError('Nie udało się załadować danych projektu');
@@ -75,14 +77,24 @@ export function ProjectForm({ onSuccess }: ProjectFormProps) {
 
   const handleAdditionalImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    setAdditionalImages(prev => [...prev, ...files]);
+    setNewAdditionalImages(prev => [...prev, ...files]);
     const newPreviews = files.map(file => URL.createObjectURL(file));
-    setAdditionalImagePreviews(prev => [...prev, ...newPreviews]);
+    setImagePreviews(prev => [...prev, ...newPreviews.map(url => ({ url, isNew: true }))]);
   };
 
   const removeAdditionalImage = (index: number) => {
-    setAdditionalImagePreviews(prev => prev.filter((_, i) => i !== index));
-    setAdditionalImages(prev => prev.filter((_, i) => i !== index));
+    const imageToRemove = imagePreviews[index];
+    if (imageToRemove.isNew) {
+      const newImageIndex = newAdditionalImages.findIndex(
+        (_, i) => URL.createObjectURL(_) === imageToRemove.url
+      );
+      if (newImageIndex !== -1) {
+        setNewAdditionalImages(prev => prev.filter((_, i) => i !== newImageIndex));
+      }
+    } else {
+      setExistingImages(prev => prev.filter(url => url !== imageToRemove.url));
+    }
+    setImagePreviews(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleDragEnter = (e: React.DragEvent) => {
@@ -114,9 +126,9 @@ export function ProjectForm({ onSuccess }: ProjectFormProps) {
     );
 
     if (files.length > 0) {
-      setAdditionalImages(prev => [...prev, ...files]);
+      setNewAdditionalImages(prev => [...prev, ...files]);
       const newPreviews = files.map(file => URL.createObjectURL(file));
-      setAdditionalImagePreviews(prev => [...prev, ...newPreviews]);
+      setImagePreviews(prev => [...prev, ...newPreviews.map(url => ({ url, isNew: true }))]);
     }
   };
 
@@ -124,8 +136,10 @@ export function ProjectForm({ onSuccess }: ProjectFormProps) {
     // Cleanup URLs when component unmounts
     return () => {
       if (mainImagePreview) URL.revokeObjectURL(mainImagePreview);
-      additionalImagePreviews.forEach(url => {
-        URL.revokeObjectURL(url);
+      imagePreviews.forEach(preview => {
+        if (preview.isNew) {
+          URL.revokeObjectURL(preview.url);
+        }
       });
     };
   }, []);
@@ -141,8 +155,8 @@ export function ProjectForm({ onSuccess }: ProjectFormProps) {
         mainImageUrl = await uploadProjectImage(mainImage);
       }
 
-      const additionalImageUrls = [...additionalImagePreviews];
-      for (const image of additionalImages) {
+      const additionalImageUrls = [...existingImages];
+      for (const image of newAdditionalImages) {
         const url = await uploadProjectImage(image);
         additionalImageUrls.push(url);
       }
@@ -367,10 +381,10 @@ export function ProjectForm({ onSuccess }: ProjectFormProps) {
               `}
             >
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {additionalImagePreviews.map((url, index) => (
+                {imagePreviews.map((preview, index) => (
                   <div key={index} className="relative w-full aspect-[4/3] rounded-lg overflow-hidden bg-gray-50">
                     <img
-                      src={url}
+                      src={preview.url}
                       alt={`Zdjęcie ${index + 1}`}
                       className="w-full h-full object-cover"
                     />
@@ -383,7 +397,7 @@ export function ProjectForm({ onSuccess }: ProjectFormProps) {
                     </button>
                   </div>
                 ))}
-                {additionalImagePreviews.length === 0 && (
+                {imagePreviews.length === 0 && (
                   <div className="col-span-full flex flex-col items-center justify-center text-gray-500 py-8">
                     <Upload className="w-12 h-12 mb-4" />
                     <p className="text-center">
@@ -403,7 +417,7 @@ export function ProjectForm({ onSuccess }: ProjectFormProps) {
                 )}
               </div>
             </div>
-            {additionalImagePreviews.length > 0 && (
+            {imagePreviews.length > 0 && (
               <div className="text-center">
                 <label className="inline-block px-4 py-2 bg-gray-100 rounded-md cursor-pointer hover:bg-gray-200 transition-colors">
                   <span className="text-gray-700">Dodaj więcej zdjęć</span>
