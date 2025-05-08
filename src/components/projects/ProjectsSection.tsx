@@ -2,36 +2,82 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Clock, CheckCircle2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Swiper, SwiperSlide } from 'swiper/react';
+import type { Swiper as SwiperType } from 'swiper';
 import { Navigation, Pagination } from 'swiper/modules';
+import { ProjectCard } from './ProjectCard';
+import { supabase } from '../../lib/supabase';
+import { Project } from '../../types/project';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-import type { Swiper as SwiperType } from 'swiper';
-import { Project } from '../../types/project';
-import { ProjectCard } from './ProjectCard';
 
 interface ProjectsSectionProps {
-  projects: Project[];
   activeProjectType: 'current' | 'completed';
   setActiveProjectType: (type: 'current' | 'completed') => void;
   onSelectProject: (project: Project) => void;
 }
 
 export function ProjectsSection({ 
-  projects, 
   activeProjectType, 
   setActiveProjectType,
   onSelectProject 
 }: ProjectsSectionProps) {
   const swiperRef = React.useRef<SwiperType>();
+  const [projects, setProjects] = React.useState<Project[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
+
   const currentProjectsCount = projects.filter(p => p.status === 'current').length;
   const completedProjectsCount = projects.filter(p => p.status === 'completed').length;
+
+  React.useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('projects')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        setProjects(data || []);
+      } catch (error) {
+        setError('Nie udało się pobrać projektów');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProjects();
+  }, []);
 
   React.useEffect(() => {
     if (swiperRef.current) {
       swiperRef.current.slideTo(0, 0);
     }
   }, [activeProjectType]);
+
+  if (loading) {
+    return (
+      <section id="projekty" className="py-20 bg-cream-100">
+        <div className="container mx-auto px-6 text-center">
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-200 rounded w-64 mx-auto mb-4"></div>
+            <div className="h-1 bg-gray-200 rounded w-24 mx-auto"></div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section id="projekty" className="py-20 bg-cream-100">
+        <div className="container mx-auto px-6 text-center text-red-600">
+          {error}
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="projekty" className="py-20 bg-cream-100">

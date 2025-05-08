@@ -5,7 +5,6 @@ import { Navigation, Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-import { projects } from './data/projects';
 import { Navbar } from './components/navigation/Navbar';
 import { HeroSection } from './components/sections/HeroSection';
 import { AboutSection } from './components/sections/AboutSection';
@@ -32,7 +31,6 @@ function MainLayout() {
       <GoalsSection />
       <ActivitiesSection />
       <ProjectsSection
-        projects={projects}
         activeProjectType={activeProjectType}
         setActiveProjectType={setActiveProjectType}
         onSelectProject={setSelectedProject}
