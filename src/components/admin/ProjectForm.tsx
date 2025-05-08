@@ -5,27 +5,64 @@ import { Project } from '../../types/project';
 import { X, Upload } from 'lucide-react';
 
 interface ProjectFormProps {
-  project?: Project;
+  project?: Project | null;
   onSuccess: () => void;
 }
 
 export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
-  const [title, setTitle] = React.useState(project?.title || '');
-  const [description, setDescription] = React.useState(project?.description || '');
-  const [status, setStatus] = React.useState<'current' | 'completed'>(project?.status || 'current');
-  const [endDate, setEndDate] = React.useState(project?.endDate || '');
-  const [goals, setGoals] = React.useState(project?.goals?.join('\n') || '');
-  const [methods, setMethods] = React.useState(project?.methods?.join('\n') || '');
-  const [scope, setScope] = React.useState(project?.scope || '');
-  const [results, setResults] = React.useState(project?.results?.join('\n') || '');
+  const [title, setTitle] = React.useState('');
+  const [description, setDescription] = React.useState('');
+  const [status, setStatus] = React.useState<'current' | 'completed'>('current');
+  const [endDate, setEndDate] = React.useState('');
+  const [goals, setGoals] = React.useState('');
+  const [methods, setMethods] = React.useState('');
+  const [scope, setScope] = React.useState('');
+  const [results, setResults] = React.useState('');
   const [mainImage, setMainImage] = React.useState<File | null>(null);
-  const [mainImagePreview, setMainImagePreview] = React.useState(project?.image || '');
+  const [mainImagePreview, setMainImagePreview] = React.useState('');
   const [additionalImages, setAdditionalImages] = React.useState<File[]>([]);
-  const [additionalImagePreviews, setAdditionalImagePreviews] = React.useState<string[]>(project?.images || []);
+  const [additionalImagePreviews, setAdditionalImagePreviews] = React.useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [isDragging, setIsDragging] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
   const dropZoneRef = React.useRef<HTMLDivElement>(null);
+  const { id } = useParams();
+
+  React.useEffect(() => {
+    const fetchProject = async () => {
+      if (!id) return;
+      
+      setIsLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('projects')
+          .select('*')
+          .eq('id', id)
+          .single();
+
+        if (error) throw error;
+        if (data) {
+          setTitle(data.title);
+          setDescription(data.description);
+          setStatus(data.status);
+          setEndDate(data.end_date || '');
+          setGoals(data.goals?.join('\n') || '');
+          setMethods(data.methods?.join('\n') || '');
+          setScope(data.scope || '');
+          setResults(data.results?.join('\n') || '');
+          setMainImagePreview(data.image || '');
+          setAdditionalImagePreviews(data.images || []);
+        }
+      } catch (error) {
+        setError('Nie udało się załadować danych projektu');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProject();
+  }, [id]);
 
   const handleMainImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -142,6 +179,11 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
   };
 
   return (
+    isLoading ? (
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-beige-400"></div>
+      </div>
+    ) : (
     <form onSubmit={handleSubmit} className="space-y-6">
       {error && (
         <div className="bg-red-50 text-red-600 p-4 rounded-md">
@@ -379,5 +421,6 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
         </button>
       </div>
     </form>
+    )
   );
 }
