@@ -4,7 +4,7 @@ export interface Project {
   description: string;
   image: string;
   status: 'current' | 'completed';
-  endDate?: string;
+  end_date?: string;
   goals?: string[];
   methods?: string[];
   scope?: string;

@@ -41,10 +41,10 @@ export function ProjectCard({ project, onSelect }: ProjectCardProps) {
             <span>Projekt w trakcie realizacji</span>
           </div>
         )}
-        {project.status === 'completed' && project.endDate && (
+        {project.status === 'completed' && project.end_date && (
           <div className="flex items-center gap-2 text-sm text-gray-500">
             <Calendar className="w-4 h-4" />
-            <span>Zakończony: {project.endDate}</span>
+            <span>Zakończony: {project.end_date}</span>
           </div>
         )}
           <button
