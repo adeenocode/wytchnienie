@@ -185,265 +185,258 @@ export function ProjectForm({ onSuccess }: ProjectFormProps) {
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-beige-400"></div>
       </div>
     ) : (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Link
-          to="/admin"
-          className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors"
-        >
-          <ArrowLeft className="w-5 h-5" />
-          <span>Powrót do listy</span>
-        </Link>
-        <h2 className="text-2xl font-medium text-gray-800">
-          {id ? 'Edycja projektu' : 'Nowy projekt'}
-        </h2>
-      </div>
-      
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {error && (
-          <div className="bg-red-50 text-red-600 p-4 rounded-md">
-            {error}
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Tytuł
-            </label>
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Tytuł
-          </label>
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Status
-          </label>
-          <select
-            value={status}
-            onChange={(e) => setStatus(e.target.value as 'current' | 'completed')}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md"
+      <div className="space-y-6">
+        <div className="flex items-center gap-4">
+          <Link
+            to="/admin"
+            className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors"
           >
-            <option value="current">W trakcie</option>
-            <option value="completed">Zakończony</option>
-          </select>
+            <ArrowLeft className="w-5 h-5" />
+            <span>Powrót do listy</span>
+          </Link>
+          <h2 className="text-2xl font-medium text-gray-800">
+            {id ? 'Edycja projektu' : 'Nowy projekt'}
+          </h2>
         </div>
+        
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {error && (
+            <div className="bg-red-50 text-red-600 p-4 rounded-md">
+              {error}
+            </div>
+          )}
 
-        {status === 'completed' && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Tytuł
+              </label>
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Status
+              </label>
+              <select
+                value={status}
+                onChange={(e) => setStatus(e.target.value as 'current' | 'completed')}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              >
+                <option value="current">W trakcie</option>
+                <option value="completed">Zakończony</option>
+              </select>
+            </div>
+
+            {status === 'completed' && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Data zakończenia
+                </label>
+                <input
+                  type="text"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  placeholder="np. Grudzień 2023"
+                  required
+                />
+              </div>
+            )}
+          </div>
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Data zakończenia
+              Opis
             </label>
-            <input
-              type="text"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              placeholder="np. Grudzień 2023"
+              rows={4}
               required
             />
           </div>
-        )}
-      </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Opis
-        </label>
-        <textarea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md"
-          rows={4}
-          required
-        />
-      </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Cele (każdy cel w nowej linii)
+            </label>
+            <textarea
+              value={goals}
+              onChange={(e) => setGoals(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              rows={4}
+            />
+          </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Cele (każdy cel w nowej linii)
-        </label>
-        <textarea
-          value={goals}
-          onChange={(e) => setGoals(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md"
-          rows={4}
-        />
-      </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Metody (każda metoda w nowej linii)
+            </label>
+            <textarea
+              value={methods}
+              onChange={(e) => setMethods(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              rows={4}
+            />
+          </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Metody (każda metoda w nowej linii)
-        </label>
-        <textarea
-          value={methods}
-          onChange={(e) => setMethods(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md"
-          rows={4}
-        />
-      </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Zakres działania
+            </label>
+            <textarea
+              value={scope}
+              onChange={(e) => setScope(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              rows={3}
+            />
+          </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Zakres działania
-        </label>
-        <textarea
-          value={scope}
-          onChange={(e) => setScope(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md"
-          rows={3}
-        />
-      </div>
-
-      {status === 'completed' && (
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Rezultaty (każdy rezultat w nowej linii)
-          </label>
-          <textarea
-            value={results}
-            onChange={(e) => setResults(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            rows={4}
-          />
-        </div>
-      )}
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Główne zdjęcie
-          {mainImagePreview && (
-            <div className="mt-2 relative w-48 h-32 rounded-lg overflow-hidden">
-              <img
-                src={mainImagePreview}
-                alt="Podgląd"
-                className="w-full h-full object-cover"
+          {status === 'completed' && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Rezultaty (każdy rezultat w nowej linii)
+              </label>
+              <textarea
+                value={results}
+                onChange={(e) => setResults(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                rows={4}
               />
-              <button
-                type="button"
-                onClick={() => {
-                  setMainImage(null);
-                  setMainImagePreview('');
-                }}
-                className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors"
-              >
-                <X className="w-4 h-4" />
-              </button>
             </div>
           )}
-        </label>
-        <input
-          type="file"
-          onChange={handleMainImageChange}
-          accept="image/*"
-          className="w-full"
-        />
-      </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Dodatkowe zdjęcia
-          <span className="text-sm text-gray-500 ml-2">
-            (możesz przeciągnąć i upuścić zdjęcia)
-          </span>
-        </label>
-        <div
-          ref={dropZoneRef}
-          onDragEnter={handleDragEnter}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-          className={`
-            border-2 border-dashed rounded-lg p-6 mb-4 transition-colors
-            ${isDragging 
-              ? 'border-beige-400 bg-beige-50' 
-              : 'border-gray-300 hover:border-beige-400'
-            }
-          `}
-        >
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {additionalImagePreviews.map((url, index) => (
-              <div key={index} className="relative w-full aspect-[4/3] rounded-lg overflow-hidden bg-gray-50">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Główne zdjęcie
+            </label>
+            {mainImagePreview && (
+              <div className="mt-2 relative w-48 h-32 rounded-lg overflow-hidden">
                 <img
-                  src={url}
-                  alt={`Zdjęcie ${index + 1}`}
+                  src={mainImagePreview}
+                  alt="Podgląd"
                   className="w-full h-full object-cover"
                 />
                 <button
                   type="button"
-                  onClick={() => removeAdditionalImage(index)}
+                  onClick={() => {
+                    setMainImage(null);
+                    setMainImagePreview('');
+                  }}
                   className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
-            ))}
-            {additionalImagePreviews.length === 0 && (
-              <div className="col-span-full flex flex-col items-center justify-center text-gray-500 py-8">
-                <Upload className="w-12 h-12 mb-4" />
-                <p className="text-center">
-                  Przeciągnij i upuść zdjęcia tutaj lub
-                  <label className="text-beige-400 hover:text-beige-500 cursor-pointer ml-1">
-                    wybierz z dysku
-                    <input
-                      type="file"
-                      multiple
-                      onChange={handleAdditionalImagesChange}
-                      accept="image/*"
-                      className="hidden"
+            )}
+            <input
+              type="file"
+              onChange={handleMainImageChange}
+              accept="image/*"
+              className="w-full"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Dodatkowe zdjęcia
+              <span className="text-sm text-gray-500 ml-2">
+                (możesz przeciągnąć i upuścić zdjęcia)
+              </span>
+            </label>
+            <div
+              ref={dropZoneRef}
+              onDragEnter={handleDragEnter}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              className={`
+                border-2 border-dashed rounded-lg p-6 mb-4 transition-colors
+                ${isDragging 
+                  ? 'border-beige-400 bg-beige-50' 
+                  : 'border-gray-300 hover:border-beige-400'
+                }
+              `}
+            >
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {additionalImagePreviews.map((url, index) => (
+                  <div key={index} className="relative w-full aspect-[4/3] rounded-lg overflow-hidden bg-gray-50">
+                    <img
+                      src={url}
+                      alt={`Zdjęcie ${index + 1}`}
+                      className="w-full h-full object-cover"
                     />
-                  </label>
-                </p>
+                    <button
+                      type="button"
+                      onClick={() => removeAdditionalImage(index)}
+                      className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+                {additionalImagePreviews.length === 0 && (
+                  <div className="col-span-full flex flex-col items-center justify-center text-gray-500 py-8">
+                    <Upload className="w-12 h-12 mb-4" />
+                    <p className="text-center">
+                      Przeciągnij i upuść zdjęcia tutaj lub
+                      <label className="text-beige-400 hover:text-beige-500 cursor-pointer ml-1">
+                        wybierz z dysku
+                        <input
+                          type="file"
+                          multiple
+                          onChange={handleAdditionalImagesChange}
+                          accept="image/*"
+                          className="hidden"
+                        />
+                      </label>
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+            {additionalImagePreviews.length > 0 && (
+              <div className="text-center">
+                <label className="inline-block px-4 py-2 bg-gray-100 rounded-md cursor-pointer hover:bg-gray-200 transition-colors">
+                  <span className="text-gray-700">Dodaj więcej zdjęć</span>
+                  <input
+                    type="file"
+                    multiple
+                    onChange={handleAdditionalImagesChange}
+                    accept="image/*"
+                    className="hidden"
+                  />
+                </label>
               </div>
             )}
           </div>
-        </div>
-        {additionalImagePreviews.length > 0 && (
-          <div className="text-center">
-            <label className="inline-block px-4 py-2 bg-gray-100 rounded-md cursor-pointer hover:bg-gray-200 transition-colors">
-              <span className="text-gray-700">Dodaj więcej zdjęć</span>
-              <input
-                type="file"
-                multiple
-                onChange={handleAdditionalImagesChange}
-                accept="image/*"
-                className="hidden"
-              />
-            </label>
-          </div>
-        )}
-      </div>
 
-      <div className="flex justify-end gap-4">
-        <button
-          type="button"
-          onClick={() => window.history.back()}
-          className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
-        >
-          Anuluj
-        </button>
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="px-6 py-2 bg-beige-400 text-white rounded-md hover:bg-beige-500 transition-colors disabled:opacity-50"
-        >
-          {isSubmitting ? 'Zapisywanie...' : 'Zapisz projekt'}
-        </button>
+          <div className="flex justify-end gap-4">
+            <button
+              type="button"
+              onClick={() => window.history.back()}
+              className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+            >
+              Anuluj
+            </button>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="px-6 py-2 bg-beige-400 text-white rounded-md hover:bg-beige-500 transition-colors disabled:opacity-50"
+            >
+              {isSubmitting ? 'Zapisywanie...' : 'Zapisz projekt'}
+            </button>
+          </div>
+        </form>
       </div>
-    </form>
     )
   );
 }
