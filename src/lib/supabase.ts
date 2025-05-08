@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { optimizeImage } from './imageOptimization';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -19,17 +20,24 @@ export async function deleteProjectImage(url: string) {
 export async function uploadProjectImage(file: File) {
   const fileExt = file.name.split('.').pop();
   const fileName = `${Math.random()}.${fileExt}`;
-  const filePath = `${fileName}`;
+  
+  // Optimize image before upload
+  const optimizedImage = await optimizeImage(file);
+  
+  // Convert optimized blob to file
+  const optimizedFile = new File([optimizedImage], fileName, {
+    type: 'image/jpeg'
+  });
 
   const { data, error } = await supabase.storage
     .from('project-images')
-    .upload(filePath, file);
+    .upload(fileName, optimizedFile);
 
   if (error) throw error;
 
   const { data: { publicUrl } } = supabase.storage
     .from('project-images')
-    .getPublicUrl(filePath);
+    .getPublicUrl(fileName);
 
   return publicUrl;
 }
