@@ -5,12 +5,11 @@ import { uploadProjectImage, deleteProjectImage } from '../../lib/supabase';
 import { Project } from '../../types/project';
 import { X, Upload } from 'lucide-react';
 
-interface ProjectFormProps {
-  project?: Project | null;
+interface ProjectFormProps { 
   onSuccess: () => void;
 }
 
-export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
+export function ProjectForm({ onSuccess }: ProjectFormProps) {
   const [title, setTitle] = React.useState('');
   const [description, setDescription] = React.useState('');
   const [status, setStatus] = React.useState<'current' | 'completed'>('current');
@@ -123,9 +122,9 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
   React.useEffect(() => {
     // Cleanup URLs when component unmounts
     return () => {
-      if (mainImagePreview && !project?.image) URL.revokeObjectURL(mainImagePreview);
+      if (mainImagePreview) URL.revokeObjectURL(mainImagePreview);
       additionalImagePreviews.forEach(url => {
-        if (!project?.images?.includes(url)) URL.revokeObjectURL(url);
+        URL.revokeObjectURL(url);
       });
     };
   }, []);
@@ -136,12 +135,12 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
     setError(null);
 
     try {
-      let mainImageUrl = project?.image;
+      let mainImageUrl = mainImagePreview;
       if (mainImage) {
         mainImageUrl = await uploadProjectImage(mainImage);
       }
 
-      const additionalImageUrls = [...(project?.images || [])];
+      const additionalImageUrls = [...additionalImagePreviews];
       for (const image of additionalImages) {
         const url = await uploadProjectImage(image);
         additionalImageUrls.push(url);
@@ -160,11 +159,11 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
         images: additionalImageUrls,
       };
 
-      if (project?.id) {
+      if (id) {
         await supabase
           .from('projects')
           .update(projectData)
-          .eq('id', project.id);
+          .eq('id', id);
       } else {
         await supabase
           .from('projects')

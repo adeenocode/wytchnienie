@@ -17,8 +17,7 @@ import { AdminLayout } from './components/admin/AdminLayout';
 import { LoginPage } from './components/admin/LoginPage';
 import { ProjectList } from './components/admin/ProjectList';
 import { ProjectForm } from './components/admin/ProjectForm';
-import { Project } from './types/project';
-import { useParams } from 'react-router-dom';
+import { Project } from './types/project'
 
 function MainLayout() {
   const [selectedProject, setSelectedProject] = React.useState<Project | null>(null);
@@ -56,7 +55,7 @@ function App() {
         <Route path="/admin/login" element={<LoginPage />} />
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<ProjectList />} />
-          <Route path="projects/new" element={<ProjectForm project={null} onSuccess={() => window.location.href = '/admin'} />} />
+          <Route path="projects/new" element={<ProjectForm onSuccess={() => window.location.href = '/admin'} />} />
           <Route path="projects/:id/edit" element={<ProjectForm onSuccess={() => window.location.href = '/admin'} />} />
         </Route>
       </Routes>
