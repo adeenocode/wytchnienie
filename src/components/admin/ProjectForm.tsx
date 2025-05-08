@@ -3,7 +3,8 @@ import { useParams } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { uploadProjectImage, deleteProjectImage } from '../../lib/supabase';
 import { Project } from '../../types/project';
-import { X, Upload } from 'lucide-react';
+import { X, Upload, ArrowLeft } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface ProjectFormProps { 
   onSuccess: () => void;
@@ -184,10 +185,32 @@ export function ProjectForm({ onSuccess }: ProjectFormProps) {
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-beige-400"></div>
       </div>
     ) : (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      {error && (
-        <div className="bg-red-50 text-red-600 p-4 rounded-md">
-          {error}
+    <div className="space-y-6">
+      <div className="flex items-center gap-4">
+        <Link
+          to="/admin"
+          className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors"
+        >
+          <ArrowLeft className="w-5 h-5" />
+          <span>Powrót do listy</span>
+        </Link>
+        <h2 className="text-2xl font-medium text-gray-800">
+          {id ? 'Edycja projektu' : 'Nowy projekt'}
+        </h2>
+      </div>
+      
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {error && (
+          <div className="bg-red-50 text-red-600 p-4 rounded-md">
+            {error}
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Tytuł
+            </label>
         </div>
       )}
 

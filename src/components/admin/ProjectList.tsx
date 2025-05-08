@@ -2,12 +2,13 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { Project } from '../../types/project';
-import { Clock, CheckCircle2, Pencil, Trash2 } from 'lucide-react';
+import { Clock, CheckCircle2, Pencil, Trash2, Filter } from 'lucide-react';
 
 export function ProjectList() {
   const [projects, setProjects] = React.useState<Project[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = React.useState<'all' | 'current' | 'completed'>('all');
 
   const fetchProjects = async () => {
     try {
@@ -53,20 +54,39 @@ export function ProjectList() {
     return <div className="text-red-600">{error}</div>;
   }
 
+  const filteredProjects = projects.filter(project => 
+    statusFilter === 'all' ? true : project.status === statusFilter
+  );
+
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-medium text-gray-800">Lista projektów</h2>
-        <Link
-          to="/admin/projects/new"
-          className="px-4 py-2 bg-beige-400 text-white rounded-md hover:bg-beige-500 transition-colors"
-        >
-          Dodaj nowy projekt
-        </Link>
+      <div className="flex flex-col gap-6 mb-6">
+        <div className="flex justify-between items-center">
+          <h2 className="text-2xl font-medium text-gray-800">Lista projektów</h2>
+          <Link
+            to="/admin/projects/new"
+            className="px-4 py-2 bg-beige-400 text-white rounded-md hover:bg-beige-500 transition-colors"
+          >
+            Dodaj nowy projekt
+          </Link>
+        </div>
+        
+        <div className="flex items-center gap-2 bg-white p-2 rounded-lg shadow-sm">
+          <Filter className="w-5 h-5 text-gray-400" />
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value as typeof statusFilter)}
+            className="border-none bg-transparent focus:ring-0 text-gray-600"
+          >
+            <option value="all">Wszystkie projekty</option>
+            <option value="current">W trakcie</option>
+            <option value="completed">Zakończone</option>
+          </select>
+        </div>
       </div>
 
       <div className="grid gap-6">
-        {projects.map((project) => (
+        {filteredProjects.map((project) => (
           <div
             key={project.id}
             className="bg-white rounded-lg shadow-sm p-6 flex items-center justify-between"
