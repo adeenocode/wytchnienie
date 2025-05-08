@@ -1,4 +1,5 @@
 import React from 'react';
+import { useParams } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { uploadProjectImage, deleteProjectImage } from '../../lib/supabase';
 import { Project } from '../../types/project';
